@@ -19,21 +19,49 @@ function loadDataTable() {
                 "data": "id",
                 "render": function (data) {
                     return `<div class="text-center">
-                     <a href="/BookList/Edit?id=${data}" class='btn btn-success text-white' style='cursor:pointer; width:100px;'>
+                     <a href="/BookList/Upsert?id=${data}" class='btn btn-success text-white' style='cursor:pointer; width:100px;'>
                         Edit
                      </a>  
                      &nbsp;
-                    <a class='btn btn-danger text-white' style='cursor:pointer; width:100px;'>
+                    <a class='btn btn-danger text-white' style='cursor:pointer; width:100px;'
+                      onclick=remove('/api/book?id='+${data})>
                         Delete
                      </a>
                     </div>`;
-                }, "width":"40%"
+                }, "width": "40%"
             }
         ],
         "language": {
             "emptyTable": "no data found"
         },
-        "width":"100%"
+        "width": "100%"
 
     })
 }
+
+    function remove(url) {
+        swal({
+            title: "Are you shure?",
+            text: "Once deleted, you will not be able to recover",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    type: "DELETE",
+                    url: url,
+                    success: function (data) {
+                        if (data.success) {
+                            toastr.success(data.message);
+                            dataTable.ajax.reload();
+                        }
+                        else {
+                            toastr.error(data.message);
+                        }
+
+                    }
+                });
+            }
+        });
+    }
